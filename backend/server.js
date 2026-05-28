@@ -15,10 +15,14 @@ connectDB();
 const app = express();
 const httpServer = http.createServer(app);
 
-// Accept any localhost port (handles Vite port auto-increment: 5173, 5174, 5175…)
+// Accept localhost (Vite) and the deployed CLIENT_URL
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || /^http:\/\/localhost:\d+$/.test(origin)) {
+    if (
+      !origin ||
+      /^http:\/\/localhost:\d+$/.test(origin) ||
+      origin === process.env.CLIENT_URL
+    ) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -46,6 +50,6 @@ app.get('/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() 
 reviewSocket(io);
 
 const PORT = process.env.PORT || 5000;
-httpServer.listen(PORT, () => {
-  console.log(`🚀 PRism server running on http://localhost:${PORT}`);
+httpServer.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 PRism server running on port ${PORT}`);
 });
